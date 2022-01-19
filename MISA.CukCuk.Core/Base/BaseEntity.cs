@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MISA.CukCuk.Core.Attributes.AttributeCRUD;
-using static MISA.CukCuk.Core.Attributes.AttributeValidate;
 using static MISA.CukCuk.Core.Enums.Enum;
 
 namespace MISA.CukCuk.Core.Entities

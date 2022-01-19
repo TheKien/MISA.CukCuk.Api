@@ -19,7 +19,7 @@ namespace MISA.CukCuk.Core.Enums
         {
             var enumPropertyName = misaEnum.ToString();
             var enumName = misaEnum.GetType().Name;
-            var resourceText = MISA.CukCuk.Core.Properties.Resources.ResourceManager.GetString($"Enum_{enumName}_{enumPropertyName}");
+            var resourceText = Properties.Resources.ResourceManager.GetString($"Enum_{enumName}_{enumPropertyName}");
             return resourceText;
         }
 

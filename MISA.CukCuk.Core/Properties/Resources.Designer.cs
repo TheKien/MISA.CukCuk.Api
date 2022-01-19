@@ -22,7 +22,7 @@ namespace MISA.CukCuk.Core.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace MISA.CukCuk.Core.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MISA.CukCuk.Core.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace MISA.CukCuk.Core.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,81 +61,54 @@ namespace MISA.CukCuk.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to STT.
-        /// </summary>
-        internal static string Excel_Index_Number {
-            get {
-                return ResourceManager.GetString("Excel_Index_Number", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ngày sinh.
-        /// </summary>
-        internal static string ExcelName_DateOfBirth {
-            get {
-                return ResourceManager.GetString("ExcelName_DateOfBirth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ngày sinh phải nhỏ hơn ngày hiện tại.
-        /// </summary>
-        internal static string Exception_Msg_DateOfBirth {
-            get {
-                return ResourceManager.GetString("Exception_Msg_DateOfBirth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Email &lt;{0}&gt; sai định dạng.
         /// </summary>
-        internal static string Exception_Msg_Email {
+        public static string Error_Msg_InValid_Email {
             get {
-                return ResourceManager.GetString("Exception_Msg_Email", resourceCulture);
+                return ResourceManager.GetString("Error_Msg_InValid_Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ID không đúng định dạng.
+        /// </summary>
+        public static string Error_Msg_InValid_Guid {
+            get {
+                return ResourceManager.GetString("Error_Msg_InValid_Guid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thông tin {0} không được bỏ trống !.
+        /// </summary>
+        public static string Error_Msg_InValid_NotEmty {
+            get {
+                return ResourceManager.GetString("Error_Msg_InValid_NotEmty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} &lt;{1}&gt; đã tồn tại trong hệ thống !.
+        /// </summary>
+        public static string Error_Msg_InValid_Unique {
+            get {
+                return ResourceManager.GetString("Error_Msg_InValid_Unique", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Dữ liệu không hợp lệ.
         /// </summary>
-        internal static string Exception_Msg_InValid {
+        public static string Exception_Msg_InValid {
             get {
                 return ResourceManager.GetString("Exception_Msg_InValid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thông tin {0} không được bỏ trống.
-        /// </summary>
-        internal static string Exception_Msg_NotEmpty {
-            get {
-                return ResourceManager.GetString("Exception_Msg_NotEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Số điện thoại &lt;{0}&gt; sai địng dạng.
-        /// </summary>
-        internal static string Exception_Msg_PhoneNumber {
-            get {
-                return ResourceManager.GetString("Exception_Msg_PhoneNumber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} &lt;{1}&gt; đã tồn tại trong hệ thống.
-        /// </summary>
-        internal static string Exception_Msg_Unique {
-            get {
-                return ResourceManager.GetString("Exception_Msg_Unique", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Đã có lỗi xảy ra. Xin vui lòng liên hệ MISA để được tư vấn..
         /// </summary>
-        internal static string Exception_User_Msg_Error {
+        public static string Exception_User_Msg_Error {
             get {
                 return ResourceManager.GetString("Exception_User_Msg_Error", resourceCulture);
             }
@@ -144,7 +117,7 @@ namespace MISA.CukCuk.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Đối tượng không được tìm thấy!.
         /// </summary>
-        internal static string Exceptione_Msg_IsExistEntity {
+        public static string Exceptione_Msg_IsExistEntity {
             get {
                 return ResourceManager.GetString("Exceptione_Msg_IsExistEntity", resourceCulture);
             }
@@ -153,63 +126,81 @@ namespace MISA.CukCuk.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Không thể xoá bản ghi này. Bản ghi hiện tại đang có bản ghi khác tham chiếu tới.
         /// </summary>
-        internal static string Exeptione_Msg_Delete_Exist_Child {
+        public static string Exeptione_Msg_Delete_Exist_Child {
             get {
                 return ResourceManager.GetString("Exeptione_Msg_Delete_Exist_Child", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Arial.
-        /// </summary>
-        internal static string Font_Name_Arial {
-            get {
-                return ResourceManager.GetString("Font_Name_Arial", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Time New Roman.
-        /// </summary>
-        internal static string Font_Name_TimeNewRoman {
-            get {
-                return ResourceManager.GetString("Font_Name_TimeNewRoman", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Yêu cầu thành công.
         /// </summary>
-        internal static string HttpCode_200 {
+        public static string HttpCode_200 {
             get {
                 return ResourceManager.GetString("HttpCode_200", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tạo mới bản ghi thành công.
+        ///   Looks up a localized string similar to Có lỗi xảy ra !.
         /// </summary>
-        internal static string HttpCode_201 {
+        public static string Status_Error {
             get {
-                return ResourceManager.GetString("HttpCode_201", resourceCulture);
+                return ResourceManager.GetString("Status_Error", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không nội dung cho yêu cầu này.
+        ///   Looks up a localized string similar to Thực thi thành công !.
         /// </summary>
-        internal static string HttpCode_204 {
+        public static string Status_Success {
             get {
-                return ResourceManager.GetString("HttpCode_204", resourceCulture);
+                return ResourceManager.GetString("Status_Success", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DANH SÁCH NHÂN VIÊN.
+        ///   Looks up a localized string similar to Dữ liệu nhập không đúng định dạng!.
         /// </summary>
-        internal static string Title_Excel_Employee {
+        public static string Status_Warning {
             get {
-                return ResourceManager.GetString("Title_Excel_Employee", resourceCulture);
+                return ResourceManager.GetString("Status_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} bản ghi được xoá !.
+        /// </summary>
+        public static string Success_Msg_Delete {
+            get {
+                return ResourceManager.GetString("Success_Msg_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} bản ghi được thêm!.
+        /// </summary>
+        public static string Success_Msg_Insert {
+            get {
+                return ResourceManager.GetString("Success_Msg_Insert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} bản ghi được thực thi thành công !.
+        /// </summary>
+        public static string Success_Msg_Update {
+            get {
+                return ResourceManager.GetString("Success_Msg_Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tồn tại bản ghi cần lấy!.
+        /// </summary>
+        public static string Warning_Msg_Entity_Null {
+            get {
+                return ResourceManager.GetString("Warning_Msg_Entity_Null", resourceCulture);
             }
         }
     }

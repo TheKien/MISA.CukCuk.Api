@@ -117,32 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExcelName_DateOfBirth" xml:space="preserve">
-    <value>Ngày sinh</value>
+  <data name="Error_Msg_InValid_Email" xml:space="preserve">
+    <value>Email &lt;{0}&gt; sai định dạng</value>
   </data>
-  <data name="Excel_Index_Number" xml:space="preserve">
-    <value>STT</value>
+  <data name="Error_Msg_InValid_Guid" xml:space="preserve">
+    <value>ID không đúng định dạng</value>
+  </data>
+  <data name="Error_Msg_InValid_NotEmty" xml:space="preserve">
+    <value>Thông tin {0} không được bỏ trống !</value>
+  </data>
+  <data name="Error_Msg_InValid_Unique" xml:space="preserve">
+    <value>{0} &lt;{1}&gt; đã tồn tại trong hệ thống !</value>
   </data>
   <data name="Exceptione_Msg_IsExistEntity" xml:space="preserve">
     <value>Đối tượng không được tìm thấy!</value>
   </data>
-  <data name="Exception_Msg_DateOfBirth" xml:space="preserve">
-    <value>Ngày sinh phải nhỏ hơn ngày hiện tại</value>
-  </data>
-  <data name="Exception_Msg_Email" xml:space="preserve">
-    <value>Email &lt;{0}&gt; sai định dạng</value>
-  </data>
   <data name="Exception_Msg_InValid" xml:space="preserve">
     <value>Dữ liệu không hợp lệ</value>
-  </data>
-  <data name="Exception_Msg_NotEmpty" xml:space="preserve">
-    <value>Thông tin {0} không được bỏ trống</value>
-  </data>
-  <data name="Exception_Msg_PhoneNumber" xml:space="preserve">
-    <value>Số điện thoại &lt;{0}&gt; sai địng dạng</value>
-  </data>
-  <data name="Exception_Msg_Unique" xml:space="preserve">
-    <value>{0} &lt;{1}&gt; đã tồn tại trong hệ thống</value>
   </data>
   <data name="Exception_User_Msg_Error" xml:space="preserve">
     <value>Đã có lỗi xảy ra. Xin vui lòng liên hệ MISA để được tư vấn.</value>
@@ -150,22 +141,28 @@
   <data name="Exeptione_Msg_Delete_Exist_Child" xml:space="preserve">
     <value>Không thể xoá bản ghi này. Bản ghi hiện tại đang có bản ghi khác tham chiếu tới</value>
   </data>
-  <data name="Font_Name_Arial" xml:space="preserve">
-    <value>Arial</value>
-  </data>
-  <data name="Font_Name_TimeNewRoman" xml:space="preserve">
-    <value>Time New Roman</value>
-  </data>
   <data name="HttpCode_200" xml:space="preserve">
     <value>Yêu cầu thành công</value>
   </data>
-  <data name="HttpCode_201" xml:space="preserve">
-    <value>Tạo mới bản ghi thành công</value>
+  <data name="Status_Error" xml:space="preserve">
+    <value>Có lỗi xảy ra !</value>
   </data>
-  <data name="HttpCode_204" xml:space="preserve">
-    <value>Không nội dung cho yêu cầu này</value>
+  <data name="Status_Success" xml:space="preserve">
+    <value>Thực thi thành công !</value>
   </data>
-  <data name="Title_Excel_Employee" xml:space="preserve">
-    <value>DANH SÁCH NHÂN VIÊN</value>
+  <data name="Status_Warning" xml:space="preserve">
+    <value>Dữ liệu nhập không đúng định dạng!</value>
+  </data>
+  <data name="Success_Msg_Delete" xml:space="preserve">
+    <value>{0} bản ghi được xoá !</value>
+  </data>
+  <data name="Success_Msg_Insert" xml:space="preserve">
+    <value>{0} bản ghi được thêm!</value>
+  </data>
+  <data name="Success_Msg_Update" xml:space="preserve">
+    <value>{0} bản ghi được thực thi thành công !</value>
+  </data>
+  <data name="Warning_Msg_Entity_Null" xml:space="preserve">
+    <value>Không tồn tại bản ghi cần lấy!</value>
   </data>
 </root>

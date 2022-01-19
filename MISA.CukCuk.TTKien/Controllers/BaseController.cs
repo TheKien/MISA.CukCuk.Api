@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MISA.CukCuk.Core.Entities;
 using MISA.CukCuk.Core.Interfaces.Infrastructure;
 using MISA.CukCuk.Core.Interfaces.Service;
 using System;
@@ -7,10 +8,10 @@ namespace MISA.CukCuk.API.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class BaseController<Entity> : ControllerBase
+    public class BaseController<TEntity> : ControllerBase
     {
-        IBaseService<Entity> _baseService;
-        public BaseController(IBaseService<Entity> baseService)
+        readonly IBaseService<TEntity> _baseService;
+        public BaseController(IBaseService<TEntity> baseService)
         {
             _baseService = baseService;
         }
@@ -28,12 +29,11 @@ namespace MISA.CukCuk.API.Controllers
                 var entites = _baseService.Get();
                 return Ok(entites);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
                 throw;
             }
-            
+
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Trả về 1 bản ghi cần lấy</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpGet("{entityId}")]
-        public IActionResult GetById(string entityId)
+        public IActionResult GetById([FromRoute]string entityId)
         {
             try
             {
@@ -51,7 +51,6 @@ namespace MISA.CukCuk.API.Controllers
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -63,10 +62,17 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Thêm bản ghi thành công</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpPost]
-        public IActionResult Insert(Entity entity)
+        public IActionResult Insert([FromBody]TEntity entity)
         {
-            var serviceResult = _baseService.Insert(entity);
-            return Ok(serviceResult);
+            try
+            {
+                ServiceResult serviceResult = _baseService.Insert(entity);
+                return Ok(serviceResult);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -77,10 +83,17 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Bản ghi được cập nhật thành công</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpPut("{entityId}")]
-        public IActionResult Update([FromBody] Entity entity, [FromRoute] Guid entityId)
+        public IActionResult Update([FromBody] TEntity entity, [FromRoute] Guid entityId)
         {
-            var serviceResult = _baseService.Update(entity, entityId);
-            return Ok(serviceResult);
+            try
+            {
+                ServiceResult serviceResult = _baseService.Update(entity, entityId);
+                return Ok(serviceResult);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -89,11 +102,17 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Trả về 1 bản ghi cần lấy</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpDelete("{entityId}")]
-        public IActionResult Delete(string entityId)
+        public IActionResult Delete([FromRoute]string entityId)
         {
-            var serviceResult = _baseService.Delete(entityId);
-            return Ok(serviceResult);
-
+            try
+            {
+                ServiceResult serviceResult = _baseService.Delete(entityId);
+                return Ok(serviceResult);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

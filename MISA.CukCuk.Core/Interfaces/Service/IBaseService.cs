@@ -22,7 +22,7 @@ namespace MISA.CukCuk.Core.Interfaces.Service
         /// <param name="entityId">Khoá chính của bản ghi cần lấy</param>
         /// <returns>Trả về 1 bản ghi cần lấy</returns>
         /// CreatedBy: TTKien(14/01/2021)
-        TEntity Get(string entityId);
+        object Get(string entityId);
 
         /// <summary>
         /// Thêm mới 1 bản ghi

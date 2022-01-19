@@ -13,7 +13,7 @@ namespace MISA.CukCuk.API.Controllers
 {
     public class FoodController : BaseController<Food>
     {
-        IFoodService _FoodService;
+        readonly IFoodService _FoodService;
         public FoodController(IFoodService FoodService) : base(FoodService)
         {
             _FoodService = FoodService;
@@ -22,8 +22,15 @@ namespace MISA.CukCuk.API.Controllers
         [HttpGet("PagingFilterSort")]
         public IActionResult GetPagingFilterSort([FromQuery]int pageIndex, int pageSize, string objectFilters, string objectSort)
         {
-            var res = _FoodService.GetPagingFilterSort(pageIndex, pageSize, objectFilters, objectSort);
-            return Ok(res);
+            try
+            {
+                var res = _FoodService.GetPagingFilterSort(pageIndex, pageSize, objectFilters, objectSort);
+                return Ok(res);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

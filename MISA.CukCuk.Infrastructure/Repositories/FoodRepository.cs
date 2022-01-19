@@ -22,21 +22,152 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         #endregion
 
         #region Method
+        /// <summary>
+        /// Lấy 1 món ăn, bếp chế biến của món ăn và sở thích phục vụ của món ăn đó
+        /// </summary>
+        /// <param name="foodId">Khoá chính</param>
+        /// <returns>Trả về 1 đối tượng món ăn</returns>
         public override Food Get(Guid foodId)
         {
+            DbConnetionOpen();
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add($"$FoodId", foodId);
             var storeName = "Proc_GetFoodById";
             using (var multi = _dbConnection.QueryMultiple(storeName, parameters, commandType: CommandType.StoredProcedure))
             {
-                var food =  multi.ReadSingleOrDefault<Food>();
+                var food = multi.ReadSingleOrDefault<Food>();
                 if (food != null)
                 {
                     food.FoodModifiers = multi.Read<FoodModifier>().ToList();
                     food.FoodKitchens = multi.Read<FoodKitchen>().ToList();
                 }
+                Dispose();
                 return food;
             }
+        }
+        /// <summary>
+        /// Thêm 1 món ăn, danh sách sở thích phục vụ của món ăn và danh sách bếp chế biến món ăn
+        /// </summary>
+        /// <param name="entity">Đối tượng món ăn</param>
+        /// <returns>Thêm thành công món ăn</returns>
+        public override int Insert(BaseEntity entity)
+        {
+            Food food = entity as Food;
+            food.FoodId = Guid.NewGuid();
+            var result = 0;
+            DbConnetionOpen();
+            using (var transaction = _dbConnection.BeginTransaction())
+            {
+                try
+                {
+                    // Thêm mới món ăn
+                    result += Insert(food, transaction);
+                    if (result > 0 && food.FoodModifiers.Count > 0)
+                    {
+                        // Thêm mới danh sách sở thích phục vụ
+                        foreach (FoodModifier fm in food.FoodModifiers)
+                        {
+                            fm.FoodId = food.FoodId;
+                            result += Insert(fm, transaction);
+                        }
+                    }
+                    if (result > 0 && food.FoodKitchens.Count > 0)
+                    {
+                        // Thêm mới danh sách bếp chế biến món ăn
+                        foreach (FoodKitchen fk in food.FoodKitchens)
+                        {
+                            fk.FoodId = food.FoodId;
+                            result += Insert(fk, transaction);
+                        }
+                    }
+                    if (result < (food.FoodModifiers.Count + food.FoodKitchens.Count + 1)) transaction.Rollback();
+                    else transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                }
+                finally
+                {
+                    Dispose();
+                }
+            }
+            return result;
+
+        }
+
+        public override int Update(BaseEntity entity, Guid entityId)
+        {
+            Food food = entity as Food;
+
+            int result = 0;
+            if (_dbConnection.State != ConnectionState.Open)
+            {
+                _dbConnection.Open();
+            }
+            using (var transaction = _dbConnection.BeginTransaction())
+            {
+                try
+                {
+                    food.FoodId = entityId;
+                    result += Update(food, transaction);
+                    if (result > 0 && food.FoodModifiers.Count > 0)
+                    {
+                        foreach (FoodModifier item in food.FoodModifiers)
+                        {
+                            item.FoodId = food.FoodId;
+                            switch (item.EditMode)
+                            {
+                                case Core.Enums.Enum.EditMode.Add:
+                                    result += Insert(item, transaction);
+                                    break;
+                                case Core.Enums.Enum.EditMode.Update:
+                                    result += Update(item, transaction);
+                                    break;
+                                case Core.Enums.Enum.EditMode.Delete:
+                                    result += Delete(item, transaction);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    if (result > 0 && food.FoodKitchens.Count > 0)
+                    {
+                        foreach (FoodKitchen item in food.FoodKitchens)
+                        {
+                            item.FoodId = food.FoodId;
+                            switch (item.EditMode)
+                            {
+                                case Core.Enums.Enum.EditMode.Add:
+                                    result += Insert(item, transaction);
+                                    break;
+                                case Core.Enums.Enum.EditMode.Update:
+                                    result += Update(item, transaction);
+                                    break;
+                                case Core.Enums.Enum.EditMode.Delete:
+                                    result += Delete(item, transaction);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    if (result < (food.FoodModifiers.Count + food.FoodKitchens.Count + 1)) transaction.Rollback();
+                    else transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
+
+                finally
+                {
+                    Dispose();
+                }
+            }
+            return result;
         }
 
         public object GetPagingFilterSort(int pageIndex, int pageSize, List<ObjectFilter> objectFilters, ObjectSort objectSort)
@@ -69,7 +200,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         /// </summary>
         /// <param name="objectFilters">Danh sách đối tượng tìm kiếm</param>
         /// <returns>Câu lệnh where trong sql</returns>
-        /// CreatedBy: TTKien(17/01/2022)
+        /// CreatedBy: TTKien(17/01/2022)       
         private static string BuildSqlWhere(List<ObjectFilter> objectFilters)
         {
             string where = string.Empty;
@@ -132,6 +263,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             }
             return where;
         }
+
         /// <summary>
         /// Convert thành 1 câu lệnh điều kiện của ORDER BY
         /// </summary>

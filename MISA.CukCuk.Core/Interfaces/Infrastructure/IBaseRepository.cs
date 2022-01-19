@@ -32,7 +32,7 @@ namespace MISA.CukCuk.Core.Interfaces.Infrastructure
         /// <param name="entity">Đối tượng cần thêm mới</param>
         /// <returns>Thêm mới bản ghi thành công</returns>
         /// CreatedBy: TTKien(14/01/2021)
-        int Insert(TEntity entity);
+        int Insert(BaseEntity entity);
 
         /// <summary>
         /// Thêm mới 1 bản ghi sử dụng transaction
@@ -40,7 +40,7 @@ namespace MISA.CukCuk.Core.Interfaces.Infrastructure
         /// <param name="entity">Đối tượng cần thêm mới</param>
         /// <returns>Thêm mới bản ghi thành công</returns>
         /// CreatedBy: TTKien(14/01/2021)
-        int Insert(TEntity entity, IDbTransaction transaction);
+        int Insert(BaseEntity entity, IDbTransaction transaction);
 
         /// <summary>
         /// Cập nhật thông tin 1 bản ghi trong bảng thông qua khoá chính của bản ghi (id)
@@ -49,7 +49,15 @@ namespace MISA.CukCuk.Core.Interfaces.Infrastructure
         /// <param name="entityId">Id để lấy về đối tượng cần cập nhật</param>
         /// <returns>Cập nhật bản ghi thành công</returns>
         /// CreatedBy: TTKien(14/01/2021)
-        int Update(TEntity entity, Guid entityId);
+        int Update(BaseEntity entity, Guid entityId);
+
+        /// <summary>
+        /// Cập nhật thông tin 1 bản ghi sử dụng transaction
+        /// </summary>
+        /// <param name="entity">Thông tin mới cần cập nhật</param>
+        /// <returns>Cập nhật bản ghi thành công</returns>
+        /// CreatedBy: TTKien(18/01/2021)
+        int Update(BaseEntity entity, IDbTransaction transaction);
 
         /// <summary>
         /// Xoá 1 bản ghi theo khoá chính
@@ -57,7 +65,15 @@ namespace MISA.CukCuk.Core.Interfaces.Infrastructure
         /// <param name="entityId">Khoá chính để lấy bản ghi cần xoá</param>
         /// <returns>Xoá 1 bản ghi thành công</returns>
         /// CreatedBy: TTKien(14/01/2021)
-        int Delete(string entityId);
+        int Delete(Guid entityId);
+
+        /// <summary>
+        /// Xoá 1 bản ghi sử dung transaction
+        /// </summary>
+        /// <param name="entity">Thông tin mới cần cập nhật</param>
+        /// <returns>Cập nhật bản ghi thành công</returns>
+        /// CreatedBy: TTKien(18/01/2021)
+        int Delete(BaseEntity entity, IDbTransaction transaction);
 
         /// <summary>
         /// Kiểm tra giá trị 1 thuộc tính của 1 đối tượng đã tồn tại trong database chưa?

@@ -22,9 +22,9 @@ namespace MISA.CukCuk.Core.Entities
         public string Messenger { get; set; }
 
         /// <summary>
-        /// Mã Code của service
+        /// Trạng thái của service
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
-        public StatusCode StatusCode { get; set; }
+        public string Status { get; set; }
     }
 }

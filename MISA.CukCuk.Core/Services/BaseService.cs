@@ -25,7 +25,7 @@ namespace MISA.CukCuk.Core.Services
         public BaseService(IBaseRepository<TEntity> baseRepository)
         {
             _baseRepository = baseRepository;
-            _serviceResult = new ServiceResult() { StatusCode = Enums.Enum.StatusCode.Success };
+            _serviceResult = new ServiceResult() { Status = Resources.Status_Success };
         }
         #endregion
 
@@ -35,56 +35,112 @@ namespace MISA.CukCuk.Core.Services
             return _baseRepository.Get();
         }
 
-        public TEntity Get(string entityId)
+        public object Get(string entityId)
         {
-            var guidEntityId = Guid.Parse(entityId);
-            return _baseRepository.Get(guidEntityId);
+            var guidEntityId = ConvertStringToGuid(entityId);
+            if (guidEntityId == Guid.Empty)
+            {
+                _serviceResult.Data = string.Empty;
+                _serviceResult.Messenger = Resources.Error_Msg_InValid_Guid;
+                _serviceResult.Status = Resources.Status_Warning;
+                return _serviceResult;
+            }
+            var entity = _baseRepository.Get(guidEntityId);
+            if (entity == null)
+            {
+                _serviceResult.Data = string.Empty;
+                _serviceResult.Messenger = Resources.Warning_Msg_Entity_Null;
+                _serviceResult.Status = Resources.Status_Warning;
+                return _serviceResult;
+            }
+            return entity;
         }
 
 
-        public ServiceResult Insert(TEntity entity)
+        public virtual ServiceResult Insert(TEntity entity)
         {
             // validate chung - base xử lý:
-            var isValid = Validate(entity, Guid.Empty);
+            var msgErr = Validate(entity, Guid.Empty);
             // validate đặc thù cho từng đối tượng -> các service con tự xử lý:
-            if (isValid == true)
+            if (msgErr.Count == 0)
             {
-                isValid = ValidateCustom(entity);
+                msgErr = ValidateCustom(entity);
             }
-            if (isValid == true)
+            if (msgErr.Count == 0)
             {
-                _serviceResult.Data = _baseRepository.Insert(entity);
-                _serviceResult.Messenger = Resources.HttpCode_201;
-                _serviceResult.StatusCode = Enums.Enum.StatusCode.Created;
+                BaseEntity baseEntity = entity as BaseEntity;
+                var rowEffecs = _baseRepository.Insert(baseEntity);
+                _serviceResult.Data = entity;
+                _serviceResult.Messenger = string.Format(Resources.Success_Msg_Insert, rowEffecs);
+            }
+            else
+            {
+                _serviceResult.Data = msgErr;
+                _serviceResult.Messenger = string.Format(Resources.Success_Msg_Insert, 0);
+                _serviceResult.Status = Resources.Status_Warning;
             }
             return _serviceResult;
         }
 
-        public ServiceResult Update(TEntity entity, Guid entityId)
+        public virtual ServiceResult Update(TEntity entity, Guid entityId)
         {
             // validate chung - base xử lý:
-            var isValid = Validate(entity, entityId);
+            var msgErr = Validate(entity, entityId);
             // validate đặc thù cho từng đối tượng -> các service con tự xử lý:
-            if (isValid == true)
+            if (msgErr.Count == 0)
             {
-                isValid = ValidateCustom(entity);
+                msgErr = ValidateCustom(entity);
             }
-            if (isValid == true)
+            if (msgErr.Count == 0)
             {
-                _serviceResult.Data = _baseRepository.Update(entity, entityId);
-                _serviceResult.Messenger = Resources.HttpCode_200;
-                _serviceResult.StatusCode = Enums.Enum.StatusCode.Success;
+                BaseEntity baseEntity = entity as BaseEntity;
+                _serviceResult.Data = _baseRepository.Update(baseEntity, entityId);
+                List<string> msgList = new List<string>();
+                _serviceResult.Messenger = string.Format(Resources.Success_Msg_Update, _serviceResult.Data);
+            }
+            else
+            {
+                _serviceResult.Data = msgErr;
+                _serviceResult.Messenger = string.Format(Resources.Success_Msg_Update, 0);
+                _serviceResult.Status = Resources.Status_Warning;
             }
             return _serviceResult;
         }
 
         public ServiceResult Delete(string entityId)
         {
-            _serviceResult.Data = _baseRepository.Delete(entityId);
-            _serviceResult.Messenger = Resources.HttpCode_204;
-            _serviceResult.StatusCode = Enums.Enum.StatusCode.NoContent;
+            var guidEntityId = ConvertStringToGuid(entityId);
+            if (guidEntityId == Guid.Empty)
+            {
+                _serviceResult.Data = 0;
+                _serviceResult.Messenger = Resources.Error_Msg_InValid_Guid;
+            }
+            else
+            {
+                _serviceResult.Data = _baseRepository.Delete(guidEntityId);
+                _serviceResult.Messenger = Resources.HttpCode_200;
+            }
+            _serviceResult.Data = _baseRepository.Delete(guidEntityId);
+            _serviceResult.Messenger = Resources.HttpCode_200;
             return _serviceResult;
 
+        }
+
+        /// <summary>
+        /// Convert string thành mã guid
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private Guid ConvertStringToGuid(string str)
+        {
+            if (str.Length == 36)
+            {
+                return Guid.Parse(str);
+            }
+            else
+            {
+                return Guid.Empty;
+            }
         }
 
         /// <summary>
@@ -93,56 +149,27 @@ namespace MISA.CukCuk.Core.Services
         /// <param name="entity">Thông tin đối tượng kiểm tra</param>
         /// <returns>True - Nếu đối tượng thoả mãn các điều kiện, False - Nếu đối tượng không thoá mãn ít nhất 1 điều kiện</returns>
         /// CreatedBy: TTKien(14/01/2022)
-        bool Validate(TEntity entity, Guid entityId)
+        protected List<string> Validate(TEntity entity, Guid entityId)
         {
+            List<string> msgErr = new List<string>();
             var entityOld = new Object();
-            // Nếu có id -> lấy về đối tượng cũ cần sửa:
+            var properties = typeof(TEntity).GetProperties().Where(p => !p.IsDefined(typeof(ReadOnly), true)).ToList();
             if (entityId != Guid.Empty)
             {
                 entityOld = _baseRepository.Get(entityId);
+                properties = properties.Where(p => !p.IsDefined(typeof(NotUpdated), true)).ToList();
             }
             if (entityOld == null)
             {
-                var msgErr = Resources.Exceptione_Msg_IsExistEntity;
-                throw new MISAResponseNotValidException(msgErr);
+                msgErr.Add(Resources.Exceptione_Msg_IsExistEntity);
+                return msgErr;
             }
-            List<string> errMsg = new List<string>();
-            // Lấy tất cả property của đối tượng:
-            var properties = typeof(TEntity).GetProperties();
-            // Duyệt từng property:
             foreach (var prop in properties)
             {
-                // Lấy tên gốc của property:
                 var propNameOrginal = prop.Name;
-                // Tên thuộc tính hiển thị trên messenger
                 var propNameDisplay = propNameOrginal;
-                // Lấy giá trị tượng ứng với đối tượng:
                 var propValue = prop.GetValue(entity);
-                // Lấy tên tự định nghĩa của property:
                 var propPropertyNames = prop.GetCustomAttributes(typeof(PropertyName), true);
-
-                // So sánh giá trị mới và giá trị cũ. Nếu bằng nhau thì bỏ qua validate
-                if (entityId != Guid.Empty)
-                {
-                    // Lấy giá trị cũ tương ứng với đối tượng
-                    var propValueOld = prop.GetValue(entityOld);
-                    if (propValue == null || propValueOld == null)
-                    {
-                        continue;
-                    }
-                    // So sánh
-                    if (String.Compare(propValue.ToString().Trim(), propValueOld.ToString().Trim()) == 0)
-                    {
-                        continue;
-                    }
-                }
-
-                // Nếu property chỉ để hiển thị hoặc không được update -> bỏ qua validate:
-                if (prop.IsDefined(typeof(ReadOnly), true) || prop.IsDefined(typeof(NotUpdated), true))
-                {
-                    continue;
-                }
-
                 // Gắn tên hiển thị
                 if (propPropertyNames.Length > 0)
                 {
@@ -155,7 +182,22 @@ namespace MISA.CukCuk.Core.Services
                     // Nếu thông tin bắt buộc nhập thì hiển thị cảnh báo hoặc đánh dấu trạng thái không hợp lệ:
                     if (propValue == null || string.IsNullOrEmpty(propValue.ToString().Trim()))
                     {
-                        errMsg.Add(string.Format(Properties.Resources.Exception_Msg_NotEmpty, propNameDisplay));
+                        msgErr.Add(string.Format(Resources.Error_Msg_InValid_NotEmty, propNameDisplay));
+                    }
+                }
+
+                if (entityId != Guid.Empty)
+                {
+                    // Lấy giá trị cũ tương ứng với đối tượng
+                    var propValueOld = prop.GetValue(entityOld);
+                    if (propValue == null)
+                    {
+                        continue;
+                    }
+                    // So sánh
+                    if (String.Compare(propValue.ToString().Trim(), propValueOld.ToString().Trim()) == 0)
+                    {
+                        continue;
                     }
                 }
 
@@ -170,29 +212,13 @@ namespace MISA.CukCuk.Core.Services
                         // Nếu giá trị đã tồn tại trong csdl:
                         if (isExist)
                         {
-                            errMsg.Add(string.Format(Properties.Resources.Exception_Msg_Unique, propNameDisplay, propValue));
+                            msgErr.Add(string.Format(Resources.Error_Msg_InValid_Unique, propNameDisplay, propValue));
                         }
                     }
 
-                    // Kiểm tra định dạng email:
-                    if (prop.IsDefined(typeof(Email), true))
-                    {
-                        Regex regex = new Regex(@"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$",
-                                                    RegexOptions.CultureInvariant | RegexOptions.Singleline);
-                        bool isValidEmail = regex.IsMatch(propValue.ToString().Trim());
-                        if (!isValidEmail)
-                        {
-                            errMsg.Add(string.Format(Resources.Exception_Msg_Email, propValue.ToString().Trim()));
-                        }
-                    }
                 }
             }
-            // Nếu có lỗi ném ra một ngoại lệ MISAResponseNotValidException
-            if (errMsg.Count() > 0)
-            {
-                throw new MISAResponseNotValidException(errMsg);
-            }
-            return true;
+            return msgErr;
         }
 
         /// <summary>
@@ -201,9 +227,9 @@ namespace MISA.CukCuk.Core.Services
         /// <param name="entity">Thông tin đối tượng kiểm tra</param>
         /// <returns>True - Nếu đối tượng thoả mãn các điều kiện, False - Nếu đối tượng không thoá mãn điều kiện</returns>
         /// CreatedBy: TTKien(14/01/2022)
-        protected virtual bool ValidateCustom(TEntity entity)
+        protected virtual List<string> ValidateCustom(TEntity entity)
         {
-            return true;
+            return new List<string>();
         }
         #endregion
     }

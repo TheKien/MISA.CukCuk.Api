@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static MISA.CukCuk.Core.Attributes.AttributeCRUD;
+using static MISA.CukCuk.Core.Attributes.AttributeKey;
 using static MISA.CukCuk.Core.Attributes.AttributeValidate;
 
 namespace MISA.CukCuk.Core.Entities
@@ -15,6 +16,7 @@ namespace MISA.CukCuk.Core.Entities
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
         [NotUpdated]
+        [Key]
         public Guid FoodId { get; set; }
 
         /// <summary>
@@ -46,13 +48,13 @@ namespace MISA.CukCuk.Core.Entities
         /// CreatedBy: TTKien(14/01/2022)
         [NotEmpty]
         [PropertyName("Giá bán")]
-        public float SellingPrice { get; set; }
+        public int? SellingPrice { get; set; }
 
         /// <summary>
         /// Giá vốn
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
-        public float? CostPrice { get; set; }
+        public int? CostPrice { get; set; }
 
         /// <summary>
         /// Mô tả

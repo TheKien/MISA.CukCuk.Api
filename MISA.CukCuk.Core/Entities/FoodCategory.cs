@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MISA.CukCuk.Core.Attributes.AttributeKey;
 
 namespace MISA.CukCuk.Core.Entities
 {
@@ -12,6 +13,7 @@ namespace MISA.CukCuk.Core.Entities
         /// Khoá chính
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
+        [Key]
         public Guid FoodCategoryId { get; set; }
 
         /// <summary>

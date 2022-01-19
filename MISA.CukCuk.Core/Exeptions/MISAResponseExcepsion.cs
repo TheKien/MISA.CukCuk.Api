@@ -22,8 +22,8 @@ namespace MISA.CukCuk.Core.Exceptions
             {
                 var result = new
                 {
-                    devMsg = MISA.CukCuk.Core.Properties.Resources.Exception_Msg_InValid,
-                    userMsg = MISA.CukCuk.Core.Properties.Resources.Exception_User_Msg_Error,
+                    devMsg = Properties.Resources.Exception_Msg_InValid,
+                    userMsg = Properties.Resources.Exception_User_Msg_Error,
                     data = exception.Value,
                     moreInfo = ""
                 };
@@ -55,7 +55,7 @@ namespace MISA.CukCuk.Core.Exceptions
                 var result = new
                 {
                     devMsg = context.Exception.Message,
-                    userMsg = MISA.CukCuk.Core.Properties.Resources.Exception_User_Msg_Error,
+                    userMsg = Properties.Resources.Exception_User_Msg_Error,
                     data = DBNull.Value,
                     moreInfo = ""
                 };

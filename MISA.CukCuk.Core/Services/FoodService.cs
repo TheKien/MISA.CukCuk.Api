@@ -2,6 +2,7 @@
 using MISA.CukCuk.Core.Entities;
 using MISA.CukCuk.Core.Interfaces.Infrastructure;
 using MISA.CukCuk.Core.Interfaces.Service;
+using MISA.CukCuk.Core.Properties;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace MISA.CukCuk.Core.Services
         public FoodService(IFoodRepository FoodRepository) : base(FoodRepository)
         {
             _foodRepository = FoodRepository;
-            _serviceResult = new ServiceResult() { StatusCode = Enums.Enum.StatusCode.Success };
+            _serviceResult = new ServiceResult() { Status = Resources.Status_Success };
         }
 
         public object GetPagingFilterSort(int pageIndex, int pageSize, string objectFilters, string objectSort)
@@ -28,5 +29,6 @@ namespace MISA.CukCuk.Core.Services
             var objectSortJson = JsonConvert.DeserializeObject<ObjectSort>(objectSort);
             return _foodRepository.GetPagingFilterSort(pageIndex, pageSize, objectFiltersJson, objectSortJson);
         }
+
     }
 }

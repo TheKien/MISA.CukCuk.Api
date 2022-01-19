@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static MISA.CukCuk.Core.Attributes.AttributeCRUD;
+using static MISA.CukCuk.Core.Attributes.AttributeKey;
 using static MISA.CukCuk.Core.Attributes.AttributeValidate;
 
 namespace MISA.CukCuk.Infrastructure.Repositories
@@ -44,13 +45,25 @@ namespace MISA.CukCuk.Infrastructure.Repositories
 
         #region Connection
         /// <summary>
-        ///  Hảm mở kết nối với Database
+        /// Hảm mở kết nối với Database
         /// </summary>
-        public void DbConnetionOpen()
+        /// CreatedBy: TTKien(14/01/2022)
+        protected void DbConnetionOpen()
         {
             if (_dbConnection.State != ConnectionState.Open)
             {
                 _dbConnection.Open();
+            }
+        }
+        /// <summary>
+        /// Hàm tắt kết nối với DB khi để tiết kiệm tại tài nguyên
+        /// </summary>
+        /// CreatedBy: TTKien(14/01/2022)
+        protected void Dispose()
+        {
+            if (_dbConnection.State == ConnectionState.Open)
+            {
+                _dbConnection.Close();
             }
         }
         #endregion 
@@ -58,6 +71,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         #region Methods
         public virtual IEnumerable<TEntity> Get()
         {
+            DbConnetionOpen();
             var storeName = string.Format(ProcGetAll, _className);
             var entites = _dbConnection.Query<TEntity>(storeName, commandType: CommandType.StoredProcedure);
             return entites;
@@ -65,6 +79,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
 
         public virtual TEntity Get(Guid entityId)
         {
+            DbConnetionOpen();
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add($"${_className}Id", entityId);
             var storeName = string.Format(ProcGetById, _className);
@@ -72,106 +87,94 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             return entity;
         }
 
-        public virtual int Insert(TEntity entity)
+        public virtual int Insert(BaseEntity entity)
+        {
+            DbConnetionOpen();
+            var parameters = MappingDbType(entity);
+            var storeName = string.Format(ProcInsert, entity.GetType().Name);
+            var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
+            return rowEffects;
+        }
+
+        public virtual int Insert(BaseEntity entity, IDbTransaction transaction)
         {
             var parameters = MappingDbType(entity);
-            var storeName = string.Format(ProcInsert, _className);
-            var rowEffects = _dbConnection.Execute(storeName, param: parameters);
+            var storeName = string.Format(ProcInsert, entity.GetType().Name);
+            var connection = transaction.Connection;
+            var rowEffects = connection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
             return rowEffects;
         }
 
-        public int Insert(TEntity entity, IDbTransaction transaction)
+        public virtual int Update(BaseEntity entity, Guid entityId)
         {
-            return 1;
-        }
-
-        public virtual int Update(TEntity entity, Guid entityId)
-        {
-            // Khởi tạo kết nối với database:
             DbConnetionOpen();
-
-            var rowEffects = 0;
-            using (var transaction = _dbConnection.BeginTransaction())
-            {
-                try
-                {
-                    // Thực thi lấy dữ liệu trong Database:
-                    DynamicParameters parameters = new DynamicParameters();
-                    var propertys = "";
-                    // Lấy ra các giá trị của property tương ứng với đối tượng:
-                    var props = typeof(TEntity).GetProperties();
-                    // Duyệt từng property
-                    foreach (var prop in props)
-                    {
-                        // Lấy tên của property:
-                        var propName = prop.Name;
-                        // Lấy giá trị tương ứng với đối tượng:
-                        var propValue = prop.GetValue(entity);
-                        // Lấy kiểu giá trị của property:
-                        var propType = prop.PropertyType;
-                        // Nếu property chỉ để hiển thị hoặc không được update -> bỏ qua khi update:
-                        if (prop.IsDefined(typeof(ReadOnly), true) || prop.IsDefined(typeof(NotUpdated), true))
-                        {
-                            continue;
-                        }
-                        // Cập nhật thời gian sửa bằng ngày hiện tại:
-                        if (propName == "ModifiedDate" && propType == typeof(DateTime))
-                        {
-                            propValue = DateTime.Now;
-                        }
-                        propertys += $"{ propName } = @{ propName },";
-                        parameters.Add($"@{propName}", propValue);
-                    }
-                    propertys = propertys.Substring(0, propertys.Length - 1);
-                    var sql = $"UPDATE { _className }  SET { propertys } WHERE { _className }Id = '{ entityId }'";
-                    rowEffects = _dbConnection.Execute(sql, param: parameters, transaction: transaction);
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                }
-            }
-
-            //Đóng kết nối:
-            Dispose();
+            var parameters = MappingDbType(entity);
+            var storeName = string.Format(ProcUpdate, entity.GetType().Name);
+            var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
             return rowEffects;
         }
 
-        public virtual int Delete(string entityId)
+        public virtual int Update(BaseEntity entity, IDbTransaction transaction)
         {
-            // Khởi tạo kết nối với database:
-            DbConnetionOpen();
-
-            var rowEffects = 0;
-            using (var transaction = _dbConnection.BeginTransaction())
-            {
-                try
-                {
-                    DynamicParameters parameters = new DynamicParameters();
-                    parameters.Add($"@{_className}Id", entityId);
-                    var storeName = string.Format(ProcDelete, _className);
-                    rowEffects = _dbConnection.Execute(storeName, parameters, transaction: transaction);
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                }
-            }
-
-            //Đóng kết nối
-            Dispose();
+            var parameters = MappingDbType(entity);
+            var storeName = string.Format(ProcUpdate, entity.GetType().Name);
+            var connection = transaction.Connection;
+            var rowEffects = connection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
             return rowEffects;
         }
 
+        public virtual int Delete(Guid entityId)
+        {
+            DbConnetionOpen();
+            DynamicParameters parameters = new DynamicParameters();
+            var where = $"{_className}Id = '{entityId}'";
+            parameters.Add("$Where", where);
+            parameters.Add("$TableName", _className);
+            var storeName = string.Format(ProcDelete, _className);
+            var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
+            return rowEffects;
+        }
 
-        private DynamicParameters MappingDbType(TEntity entity)
+        public virtual int Delete(BaseEntity entity, IDbTransaction transaction)
+        {
+            DynamicParameters parameters = new DynamicParameters();
+            //var propertyId = entity.GetType().GetProperties().Where(p => p.IsDefined(typeof(Key), true)));
+            //var where = $"{entity.GetType().Name}Id = '{propertyId.GetValue(entity)}'";
+
+            //if (propertyId == null)
+            //{
+            var where = string.Empty;
+            var foreignKeys = entity.GetType().GetProperties().Where(p => p.IsDefined(typeof(ForeigeKey), true)).ToList();
+            foreach (var fk in foreignKeys)
+            {
+                where += $" {fk.Name}='{fk.GetValue(entity)}' AND";
+            }
+            where = where.Substring(0, where.LastIndexOf(" "));
+            //}
+            parameters.Add("$Where", where);
+            parameters.Add("$TableName", entity.GetType().Name);
+            var connection = transaction.Connection;
+            var storeName = "Proc_DeleteEntity";
+            var rowEffects = connection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure, transaction: transaction);
+            return rowEffects;
+        }
+
+        /// <summary>
+        /// Mapping dữ liệu và set giá trị parameter
+        /// </summary>
+        /// <param name="entity">Đối tượng mapping</param>
+        /// <returns>parameters chứ giá trị của đối tượng</returns>
+        private DynamicParameters MappingDbType(BaseEntity entity)
         {
             DynamicParameters parameters = new DynamicParameters();
 
-            // Lấy ra các giá trị của property tương ứng với đối tượng:
-            var properties = typeof(TEntity).GetProperties().Where(p => !p.IsDefined(typeof(ReadOnly), true)).ToList();
+            // Lấy ra các property tương ứng với đối tượng trừ các trường chỉ để hiển thị:
+            var properties = entity.GetType().GetProperties().Where(p => !p.IsDefined(typeof(ReadOnly), true)).ToList();
+            // Nếu là update bỏ qua các trường không được update
+            if (entity.EditMode == Core.Enums.Enum.EditMode.Update)
+            {
+                properties = properties.Where(p => !p.IsDefined(typeof(NotUpdated), true)).ToList();
+            }
             foreach (var prop in properties)
             {
                 var propName = prop.Name;
@@ -195,39 +198,21 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         {
             // Khởi tạo kết nối với database:
             DbConnetionOpen();
-
-            // lấy tên property:
             var propertyName = property.Name;
-            // lấy giá trị property
             var propertyValue = property.GetValue(entity);
-
-            var param = new DynamicParameters();
-            param.Add($"@{propertyName}", propertyValue);
-            var sql = $"SELECT * FROM { _className } WHERE { propertyName } = '{ propertyValue }'";
-            var entityExist = _dbConnection.Query(sql, param: param).FirstOrDefault();
-            if (entityExist != null)
-            {
-                //Đóng kết nối
-                Dispose();
-                return true;
-            }
-
-            //Đóng kết nối
-            Dispose();
-            return false;
+            DynamicParameters parameters = new DynamicParameters();
+            // build where
+            string where;
+            if (property.PropertyType == typeof(int)) { where = $"{ propertyName } = { propertyValue }"; }
+            else { where = $"{ propertyName } = '{ propertyValue }'"; }
+            parameters.Add("$Where", where);
+            parameters.Add("$TableName", _className);
+            var storeName = "Proc_GetEntityByProperty";
+            var entityExist = _dbConnection.QueryFirstOrDefault(storeName, parameters, commandType: CommandType.StoredProcedure);
+            if (entityExist == null) return false;
+            return true;
         }
 
-        /// <summary>
-        /// Hàm tắt kết nối với DB khi để tiết kiệm tại tài nguyên
-        /// </summary>
-        /// CreatedBy: TTKien(14/01/2022)
-        protected void Dispose()
-        {
-            if (_dbConnection.State == ConnectionState.Open)
-            {
-                _dbConnection.Close();
-            }
-        }
         #endregion
     }
 }
