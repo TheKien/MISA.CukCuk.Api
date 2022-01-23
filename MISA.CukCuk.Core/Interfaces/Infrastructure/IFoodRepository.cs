@@ -19,5 +19,7 @@ namespace MISA.CukCuk.Core.Interfaces.Infrastructure
         /// <returns>Danh sách bản ghi cần tìm kiếm</returns>
         /// CreatedBy: TTKien(16/01/2022)
         object GetPagingFilterSort(int pageIndex, int pageSize, List<ObjectFilter> objectFilters, ObjectSort objectSort);
+
+
     }
 }

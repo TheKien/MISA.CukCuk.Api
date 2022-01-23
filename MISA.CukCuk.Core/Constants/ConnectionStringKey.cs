@@ -9,5 +9,7 @@ namespace MISA.CukCuk.Core.Constants
     public class ConnectionStringKey
     {
         public const string DB = "CukCuk";
+
+        public const string PathImage = "Path";
     }
 }

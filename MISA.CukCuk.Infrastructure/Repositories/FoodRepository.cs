@@ -7,6 +7,7 @@ using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,11 @@ namespace MISA.CukCuk.Infrastructure.Repositories
 {
     public class FoodRepository : BaseRepository<Food>, IFoodRepository
     {
+        private string _path;
         #region Contructor
         public FoodRepository(IConfiguration configuration) : base(configuration)
         {
+            _path = configuration[Core.Constants.ConnectionStringKey.PathImage];
         }
         #endregion
 
@@ -41,15 +44,17 @@ namespace MISA.CukCuk.Infrastructure.Repositories
                     food.FoodModifiers = multi.Read<FoodModifier>().ToList();
                     food.FoodKitchens = multi.Read<FoodKitchen>().ToList();
                 }
-                Dispose();
+                DbConnetionClose();
                 return food;
             }
         }
+
         /// <summary>
         /// Thêm 1 món ăn, danh sách sở thích phục vụ của món ăn và danh sách bếp chế biến món ăn
         /// </summary>
         /// <param name="entity">Đối tượng món ăn</param>
         /// <returns>Thêm thành công món ăn</returns>
+        /// 
         public override int Insert(BaseEntity entity)
         {
             Food food = entity as Food;
@@ -60,6 +65,16 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             {
                 try
                 {
+                    //if (food.ImageName != null)
+                    //{
+                    //    var arrData = food.ImageName.Split(';');
+                    //    if (arrData.Length == 3)
+                    //    {
+                    //        var savePath = $@"food/{arrData[0]}";
+                    //        food.ImageName = $"{savePath}";
+                    //        SaveFileFromBase64String(savePath, arrData[2]);
+                    //    }
+                    //}
                     // Thêm mới món ăn
                     result += Insert(food, transaction);
                     if (result > 0 && food.FoodModifiers.Count > 0)
@@ -89,13 +104,20 @@ namespace MISA.CukCuk.Infrastructure.Repositories
                 }
                 finally
                 {
-                    Dispose();
+                    DbConnetionClose();
                 }
             }
             return result;
 
         }
 
+        /// <summary>
+        /// Cập nhật 1 món ăn, danh sách sở thích phục vụ của món ăn và danh sách bếp chế biến
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        /// CreatedBy: TTKien(19/01/2022)
         public override int Update(BaseEntity entity, Guid entityId)
         {
             Food food = entity as Food;
@@ -164,7 +186,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
 
                 finally
                 {
-                    Dispose();
+                    DbConnetionClose();
                 }
             }
             return result;
@@ -172,6 +194,8 @@ namespace MISA.CukCuk.Infrastructure.Repositories
 
         public object GetPagingFilterSort(int pageIndex, int pageSize, List<ObjectFilter> objectFilters, ObjectSort objectSort)
         {
+            DbConnetionOpen();
+
             string where = BuildSqlWhere(objectFilters);
             string sort = BuildSqlSort(objectSort);
             DynamicParameters parameters = new();
@@ -187,6 +211,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             var entities = _dbConnection.Query<Food>(storeName, param: parameters, commandType: CommandType.StoredProcedure);
             var totalPage = parameters.Get<int>("$TotalPage");
             var totalRecord = parameters.Get<int>("$TotalRecord");
+            DbConnetionClose();
             return new
             {
                 TotalRecord = totalRecord,
@@ -289,6 +314,45 @@ namespace MISA.CukCuk.Infrastructure.Repositories
                 }
             }
             return sort;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="RelativePathFileName"></param>
+        /// <param name="dataFromBase64String"></param>
+        /// <returns></returns>
+        public string SaveFileFromBase64String(string RelativePathFileName, string dataFromBase64String)
+        {
+            if (dataFromBase64String.Contains("base64,"))
+            {
+                dataFromBase64String = dataFromBase64String.Substring(dataFromBase64String.IndexOf("base64,", 0) + 7);
+            }
+            return WriteFileToAuthAccessFolder(RelativePathFileName, dataFromBase64String);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="RelativePathFileName"></param>
+        /// <param name="base64StringData"></param>
+        /// <returns></returns>
+        public string WriteFileToAuthAccessFolder(string RelativePathFileName, string base64StringData)
+        {
+            try
+            {
+                string result = "";
+                string serverRootPathFolder = _path;
+                string fullPathFile = $@"{serverRootPathFolder}\{RelativePathFileName}";
+                string fullPathFolder = Path.GetDirectoryName(fullPathFile);
+                if (!Directory.Exists(fullPathFolder))
+                    Directory.CreateDirectory(fullPathFolder);
+                File.WriteAllBytes(fullPathFile, Convert.FromBase64String(base64StringData));
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
         #endregion
     }

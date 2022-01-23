@@ -18,7 +18,7 @@ namespace MISA.CukCuk.Core.Entities
         /// CreatedBy: TTKien(14/01/2022)
         [ForeigeKey]
         [NotUpdated]
-        public Guid FoodId { get; set; }
+        public Guid? FoodId { get; set; }
 
         /// <summary>
         /// Khoá ngoại sở thích phục vụ
@@ -39,7 +39,6 @@ namespace MISA.CukCuk.Core.Entities
         /// Phí phát sinh sở thích phục vụ
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
-        [ReadOnly]
-        public int AdditionalCharge { get; set; }
+        public int? AdditionalCharge { get; set; }
     }
 }

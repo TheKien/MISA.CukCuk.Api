@@ -190,7 +190,7 @@ namespace MISA.CukCuk.Core.Services
                 {
                     // Lấy giá trị cũ tương ứng với đối tượng
                     var propValueOld = prop.GetValue(entityOld);
-                    if (propValue == null)
+                    if (propValue == null|| propValueOld == null)
                     {
                         continue;
                     }

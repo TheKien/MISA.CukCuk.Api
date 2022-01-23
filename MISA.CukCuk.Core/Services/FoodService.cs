@@ -25,8 +25,20 @@ namespace MISA.CukCuk.Core.Services
         public object GetPagingFilterSort(int pageIndex, int pageSize, string objectFilters, string objectSort)
         {
             // Convert string json => list object
-            var objectFiltersJson = JsonConvert.DeserializeObject<List<ObjectFilter>>(objectFilters);
-            var objectSortJson = JsonConvert.DeserializeObject<ObjectSort>(objectSort);
+            List<ObjectFilter> objectFiltersJson = new List<ObjectFilter>();
+            ObjectSort objectSortJson = new ObjectSort();
+
+            objectFiltersJson = JsonConvert.DeserializeObject<List<ObjectFilter>>(objectFilters);
+
+            if (objectSort == null)
+            {
+                objectSortJson = null;
+            }
+            else
+            {
+                objectSortJson = JsonConvert.DeserializeObject<ObjectSort>(objectSort);
+            }
+
             return _foodRepository.GetPagingFilterSort(pageIndex, pageSize, objectFiltersJson, objectSortJson);
         }
 

@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace MISA.CukCuk.API.Controllers
 {
-    public class FoodController : BaseController<Food>
+    public class FoodsController : BaseController<Food>
     {
         readonly IFoodService _FoodService;
-        public FoodController(IFoodService FoodService) : base(FoodService)
+        public FoodsController(IFoodService FoodService) : base(FoodService)
         {
             _FoodService = FoodService;
         }

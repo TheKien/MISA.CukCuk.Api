@@ -17,7 +17,7 @@ namespace MISA.CukCuk.Core.Entities
         /// CreatedBy: TTKien(14/01/2022)
         [ForeigeKey]
         [NotUpdated]
-        public Guid FoodId { get; set; }
+        public Guid? FoodId { get; set; }
 
         /// <summary>
         /// Khoá ngoại bếp

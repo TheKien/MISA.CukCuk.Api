@@ -42,7 +42,7 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Trả về 1 bản ghi cần lấy</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpGet("{entityId}")]
-        public IActionResult GetById([FromRoute]string entityId)
+        public IActionResult GetById([FromRoute] string entityId)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace MISA.CukCuk.API.Controllers
         /// <returns>Thêm bản ghi thành công</returns>
         /// CreateBy: TTKien(14/01/2022)
         [HttpPost]
-        public IActionResult Insert([FromBody]TEntity entity)
+        public IActionResult Inser([FromBody] TEntity entity)
         {
             try
             {

@@ -59,7 +59,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         /// Hàm tắt kết nối với DB khi để tiết kiệm tại tài nguyên
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
-        protected void Dispose()
+        protected void DbConnetionClose()
         {
             if (_dbConnection.State == ConnectionState.Open)
             {
@@ -74,6 +74,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             DbConnetionOpen();
             var storeName = string.Format(ProcGetAll, _className);
             var entites = _dbConnection.Query<TEntity>(storeName, commandType: CommandType.StoredProcedure);
+            DbConnetionClose();
             return entites;
         }
 
@@ -84,6 +85,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             parameters.Add($"${_className}Id", entityId);
             var storeName = string.Format(ProcGetById, _className);
             var entity = _dbConnection.QueryFirstOrDefault(storeName, parameters, commandType: CommandType.StoredProcedure);
+            DbConnetionClose();
             return entity;
         }
 
@@ -93,6 +95,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             var parameters = MappingDbType(entity);
             var storeName = string.Format(ProcInsert, entity.GetType().Name);
             var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
+            DbConnetionClose();
             return rowEffects;
         }
 
@@ -111,6 +114,7 @@ namespace MISA.CukCuk.Infrastructure.Repositories
             var parameters = MappingDbType(entity);
             var storeName = string.Format(ProcUpdate, entity.GetType().Name);
             var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
+            DbConnetionClose();
             return rowEffects;
         }
 
@@ -127,11 +131,13 @@ namespace MISA.CukCuk.Infrastructure.Repositories
         {
             DbConnetionOpen();
             DynamicParameters parameters = new DynamicParameters();
-            var where = $"{_className}Id = '{entityId}'";
-            parameters.Add("$Where", where);
-            parameters.Add("$TableName", _className);
+            //var where = $"{_className}Id = '{entityId}'";
+            //parameters.Add("$Where", where);
+            //parameters.Add("$TableName", _className);
+            parameters.Add($"${_className}Id", entityId);
             var storeName = string.Format(ProcDelete, _className);
             var rowEffects = _dbConnection.Execute(storeName, parameters, commandType: CommandType.StoredProcedure);
+            DbConnetionClose();
             return rowEffects;
         }
 

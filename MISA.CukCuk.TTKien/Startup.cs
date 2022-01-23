@@ -21,9 +21,15 @@ namespace MISA.CukCuk.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(env.ContentRootPath)
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+               .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+               .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -47,7 +53,14 @@ namespace MISA.CukCuk.Api
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped(typeof(IFoodRepository), typeof(FoodRepository));
             services.AddScoped(typeof(IFoodService), typeof(FoodService));
-
+            services.AddScoped(typeof(IUnitRepository), typeof(UnitRepository));
+            services.AddScoped(typeof(IUnitService), typeof(UnitService));
+            services.AddScoped(typeof(IModifierRepository), typeof(ModifierRepository));
+            services.AddScoped(typeof(IModifierService), typeof(ModifierService));
+            services.AddScoped(typeof(IKitchenRepository), typeof(KitchenRepository));
+            services.AddScoped(typeof(IKitchenService), typeof(KitchenService));
+            services.AddScoped(typeof(IMenuCategoryRepository), typeof(MenuCategoryRepository));
+            services.AddScoped(typeof(IMenuCategoryService), typeof(MenuCategoryService));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MISA.CukCuk.Api", Version = "v1" });

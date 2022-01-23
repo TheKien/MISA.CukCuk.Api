@@ -17,7 +17,7 @@ namespace MISA.CukCuk.Core.Entities
         /// CreatedBy: TTKien(14/01/2022)
         [NotUpdated]
         [Key]
-        public Guid FoodId { get; set; }
+        public Guid? FoodId { get; set; }
 
         /// <summary>
         /// Mã món
@@ -72,7 +72,7 @@ namespace MISA.CukCuk.Core.Entities
         /// Khoá chính
         /// </summary>
         /// CreatedBy: TTKien(14/01/2022)
-        public Guid? ImageId { get; set; }
+        public string ImageName { get; set; }
 
         /// <summary>
         /// Khoá ngoại nhóm món ăn
